@@ -1,0 +1,81 @@
+# Adapted from https://caddy.community/t/caddyfile-for-drupal-10/21607/5
+{
+	{$CADDY_GLOBAL_OPTIONS}
+
+	frankenphp {
+		{$FRANKENPHP_CONFIG}
+	}
+
+	# https://caddyserver.com/docs/caddyfile/directives#sorting-algorithm
+	order php_server before file_server
+	order php before file_server
+}
+
+{$CADDY_EXTRA_CONFIG}
+
+:80 {
+	root * /www/current/web
+	encode zstd br gzip
+
+	@hiddenPhpFilesRegexp path_regexp \..*/.*\.php$
+	error @hiddenPhpFilesRegexp 403
+
+	@notFoundPhpFiles path_regexp /vendor/.*\.php$
+	error @notFoundPhpFiles 404
+
+	@notFoundPhpFilesRegexp path_regexp ^/sites/[^/]+/files/.*\.php$
+	error @notFoundPhpFilesRegexp 404
+
+	@privateDirRegexp path_regexp ^/sites/.*/private/
+	error @privateDirRegexp 403
+
+	@protectedFilesRegexp {
+		not path /.well-known*
+		path_regexp \.(engine|inc|install|make|module|profile|po|sh|.*sql|theme|twig|tpl(\.php)?|xtmpl|yml)(~|\.sw[op]|\.bak|\.orig|\.save)?$|^/(\..*|Entries.*|Repository|Root|Tag|Template|composer\.(json|lock)|web\.config|yarn\.lock|package\.json)$|^\/#.*#$|\.php(~|\.sw[op]|\.bak|\.orig|\.save)$
+	}
+	error @protectedFilesRegexp 403
+
+	# Long-lived caching for static assets. Mirrors the dev directives in
+	# .ddev/docker-compose.frankenphp_extra.yaml so measured behaviour matches.
+	#
+	# Every matcher is guarded by `file`, so the headers are only ever sent for
+	# responses the file server actually serves off disk. Without that guard a
+	# missing asset falls through to Drupal, which sets its own Cache-Control,
+	# and the response goes out with two conflicting ones.
+
+	# URL changes whenever the bytes do: Drupal's global ?tkbuh0 query on
+	# library assets, core's pinned ?v= on htmx.
+	@assets_versioned {
+		file
+		path_regexp ^/(core|modules|themes|libraries)/.+\.(css|js|mjs|map|svg|avif|webp|png|jpe?g|gif|ico|woff2?|ttf|otf)$
+	}
+	header @assets_versioned Cache-Control "public, max-age=31536000, immutable"
+
+	# Content-hashed aggregate filenames.
+	@assets_aggregated {
+		file
+		path_regexp ^/sites/[^/]+/files/(css|js)/
+	}
+	header @assets_aggregated Cache-Control "public, max-age=31536000, immutable"
+
+	# Image-style derivatives: path is stable per style + source file, and a
+	# re-crop writes to a new path.
+	@image_derivatives {
+		file
+		path_regexp ^/sites/[^/]+/files/styles/
+	}
+	header @image_derivatives Cache-Control "public, max-age=31536000, immutable"
+
+	# Raw uploads: stable URLs that can be replaced in place, so they get
+	# Drupal core's default two weeks rather than a year.
+	@uploads {
+		file
+		path_regexp ^/sites/[^/]+/files/
+		not path_regexp ^/sites/[^/]+/files/(css|js|styles)/
+	}
+	header @uploads Cache-Control "public, max-age=1209600"
+
+	{$CADDY_SERVER_EXTRA_DIRECTIVES}
+
+	php_server
+}

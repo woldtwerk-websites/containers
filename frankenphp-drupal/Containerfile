@@ -1,0 +1,31 @@
+FROM dunglas/frankenphp:1-php8.5
+
+RUN install-php-extensions \
+    apcu \
+    bcmath \
+    gd \
+    opcache \
+    pdo_mysql \
+    pdo_pgsql \
+    redis \
+    zip
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  libedit2 \
+  libncurses6 \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY --from=drupal:php8.5 /usr/local/etc/php/conf.d/* /usr/local/etc/php/conf.d/
+COPY --from=composer/composer:2-bin /composer /usr/local/bin/
+COPY --from=mariadb:lts /usr/bin/mariadb /usr/local/bin/mysql
+COPY --from=mariadb:lts /usr/bin/mariadb-dump /usr/local/bin/mysqldump
+
+ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV SERVER_NAME=:80
+
+WORKDIR /www
+COPY Caddyfile /etc/frankenphp/Caddyfile
+RUN set -eux; \
+    rm -rf /app/public
+
+ENV PATH=${PATH}:/www/current/vendor/bin
