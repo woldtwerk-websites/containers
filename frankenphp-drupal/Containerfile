@@ -25,6 +25,7 @@ ENV SERVER_NAME=:80
 
 WORKDIR /www
 COPY Caddyfile /etc/frankenphp/Caddyfile
+COPY php.ini /usr/local/etc/php/conf.d/zz-drupal.ini
 RUN set -eux; \
     rm -rf /app/public
 
