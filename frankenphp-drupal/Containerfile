@@ -17,8 +17,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY --from=drupal:php8.5 /usr/local/etc/php/conf.d/* /usr/local/etc/php/conf.d/
 COPY --from=composer/composer:2-bin /composer /usr/local/bin/
-COPY --from=mariadb:lts /usr/bin/mariadb /usr/local/bin/mysql
-COPY --from=mariadb:lts /usr/bin/mariadb-dump /usr/local/bin/mysqldump
+COPY --from=mariadb:12 /usr/bin/mariadb /usr/local/bin/mysql
+COPY --from=mariadb:12 /usr/bin/mariadb-dump /usr/local/bin/mysqldump
 COPY --from=node:26-trixie-slim /usr/local/bin/node /usr/local/bin/
 COPY --from=node:26-trixie-slim /usr/local/lib/node_modules /usr/local/lib/node_modules
 RUN set -eux; \
