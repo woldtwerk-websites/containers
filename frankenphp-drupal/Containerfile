@@ -15,10 +15,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   libncurses6 \
   && rm -rf /var/lib/apt/lists/*
 
-COPY --from=drupal:php8.5 /usr/local/etc/php/conf.d/* /usr/local/etc/php/conf.d/
-COPY --from=composer/composer:2-bin /composer /usr/local/bin/
-COPY --from=mariadb:12 /usr/bin/mariadb /usr/local/bin/mysql
-COPY --from=mariadb:12 /usr/bin/mariadb-dump /usr/local/bin/mysqldump
+COPY --from=drupal:php8.5@sha256:45038cb0a815fad7d62f05d3a43fcadb0c7337ee8c8c4c82ed050cf89b5b7294 /usr/local/etc/php/conf.d/* /usr/local/etc/php/conf.d/
+COPY --from=composer/composer:2-bin@sha256:016c41066558559142758092f7ef286d66ae113df23d49e086fdda0166dd5f01 /composer /usr/local/bin/
+COPY --from=mariadb:12@sha256:99c125f103f5d081ebbc9ffe064e63daf7f688ac33a5f7f29af2d7260a96debf /usr/bin/mariadb /usr/local/bin/mysql
+COPY --from=mariadb:12@sha256:99c125f103f5d081ebbc9ffe064e63daf7f688ac33a5f7f29af2d7260a96debf /usr/bin/mariadb-dump /usr/local/bin/mysqldump
 COPY --from=node:26-trixie-slim /usr/local/bin/node /usr/local/bin/
 COPY --from=node:26-trixie-slim /usr/local/lib/node_modules /usr/local/lib/node_modules
 RUN set -eux; \
