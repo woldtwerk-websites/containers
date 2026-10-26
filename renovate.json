@@ -2,5 +2,13 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "local>woldtwerk-websites/renovate-config"
+  ],
+  "packageRules": [
+    {
+      "description": "MariaDB client: stay on the 12.x LTS line, raise with the next LTS",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["mariadb"],
+      "allowedVersions": "<13"
+    }
   ]
 }
