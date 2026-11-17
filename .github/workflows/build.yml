@@ -4,6 +4,11 @@ on:
   # Builds without pushing, so Renovate automerges base image updates only when
   # the image still builds.
   pull_request:
+  # A merged base image update reaches the registry right away, not with the
+  # nightly build.
+  push:
+    branches:
+      - main
   schedule:
     - cron: "0 3 * * *"
   workflow_dispatch:
