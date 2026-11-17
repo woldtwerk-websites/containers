@@ -1,6 +1,9 @@
 name: Build containers
 
 on:
+  # Builds without pushing, so Renovate automerges base image updates only when
+  # the image still builds.
+  pull_request:
   schedule:
     - cron: "0 3 * * *"
   workflow_dispatch:
@@ -21,6 +24,7 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
 
       - name: Log in to ghcr.io
+        if: github.event_name != 'pull_request'
         run: echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Build
@@ -34,4 +38,5 @@ jobs:
             "${{ matrix.image }}"
 
       - name: Push
+        if: github.event_name != 'pull_request'
         run: podman push "$IMAGE:latest"
