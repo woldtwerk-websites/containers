@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   libncurses6 \
   && rm -rf /var/lib/apt/lists/*
 
-COPY --from=drupal:php8.5@sha256:0e3f1001a265ccc3629a81b5889a2ecf61a0908152fbc0c772722965b7a81dae /usr/local/etc/php/conf.d/* /usr/local/etc/php/conf.d/
+COPY --from=drupal:php8.5@sha256:f31a67bbed9668d7c3d5e2cbdfd3584d4542d29329a1fff90b5c488aa582d097 /usr/local/etc/php/conf.d/* /usr/local/etc/php/conf.d/
 COPY --from=composer/composer:2-bin@sha256:269d47ef954e254227bccb35e3e40f642756abee44dded405e1fbb6f5e52af0c /composer /usr/local/bin/
 COPY --from=mariadb:12@sha256:4ebbcf100a3ba320766dfa0e1af008df12261301db6ef72798c7650f70794aed /usr/bin/mariadb /usr/local/bin/mysql
 COPY --from=mariadb:12@sha256:4ebbcf100a3ba320766dfa0e1af008df12261301db6ef72798c7650f70794aed /usr/bin/mariadb-dump /usr/local/bin/mysqldump
