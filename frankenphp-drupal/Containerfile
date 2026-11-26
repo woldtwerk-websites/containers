@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:1-php8.5@sha256:0b21a2960d1a2e146d283f1e3ee7ef64b3c27781e372f13457f1c41d2419be75
+FROM dunglas/frankenphp:1-php8.5@sha256:b8e0919047838ea32771ef573d74df9a9128de1e908a999366e26c11bc6e7ba4
 
 RUN install-php-extensions \
     apcu \
@@ -16,8 +16,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   libncurses6 \
   && rm -rf /var/lib/apt/lists/*
 
-COPY --from=drupal:php8.5@sha256:1241926b63043c3c0f42df3cc99c51b1122661581bb79574ddb177a4955c96be /usr/local/etc/php/conf.d/* /usr/local/etc/php/conf.d/
-COPY --from=composer/composer:2-bin@sha256:4eaf89f62eb9504807f2828f1829a71b7fcd202e89abe2f41c1fb2136068fbfb /composer /usr/local/bin/
+COPY --from=drupal:php8.5@sha256:c26c343cb9b96a4a45f60937e6f15af3e6065601c34b61fba6c9274943072a2f /usr/local/etc/php/conf.d/* /usr/local/etc/php/conf.d/
+COPY --from=composer/composer:2-bin@sha256:2990de2e55e336422625cdac47b76dcf66a19e5b624d9c8b2f2c30a016242a58 /composer /usr/local/bin/
 COPY --from=mariadb:12@sha256:4aaf88b3106382c8c18e49f0cec60267be618fc22f858c4503afb2a2555afed3 /usr/bin/mariadb /usr/local/bin/mysql
 COPY --from=mariadb:12@sha256:4aaf88b3106382c8c18e49f0cec60267be618fc22f858c4503afb2a2555afed3 /usr/bin/mariadb-dump /usr/local/bin/mysqldump
 COPY --from=node:26-trixie-slim@sha256:abe7e5a82b61a8ef67b315b85497c9e65173387ccf2f4a029248184b8e020be5 /usr/local/bin/node /usr/local/bin/
