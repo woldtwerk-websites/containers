@@ -4,7 +4,7 @@
 ARG TAMER_REF=8818a2bbfd939a015ea16d6098a50affa6130fc2
 
 # Upstream source at that commit, without a history the build does not need
-FROM node:22-alpine AS source
+FROM node:22-alpine@sha256:1314fb30ec37592d5845e5a160d522c0e680972aa534549940b8d73bde88481a AS source
 
 ARG TAMER_REF
 
@@ -28,7 +28,7 @@ WORKDIR /build-captcha
 # The CAPTCHA binary pins its package through the `tool` directive in go.mod
 RUN CGO_ENABLED=0 sh -c 'go build -o proton-auth-captcha $(go list tool)'
 
-FROM node:22-alpine AS builder
+FROM node:22-alpine@sha256:1314fb30ec37592d5845e5a160d522c0e680972aa534549940b8d73bde88481a AS builder
 
 RUN apk add --no-cache python3 py3-setuptools make g++ libc6-compat \
     cairo-dev pango-dev jpeg-dev giflib-dev librsvg-dev
@@ -39,7 +39,7 @@ RUN npm ci \
   && npm run build \
   && npm prune --production
 
-FROM node:22-alpine
+FROM node:22-alpine@sha256:1314fb30ec37592d5845e5a160d522c0e680972aa534549940b8d73bde88481a
 
 # tini: reaps orphans while the entrypoint runs as PID 1
 RUN apk add --no-cache tini
